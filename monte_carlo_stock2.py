@@ -14,13 +14,14 @@ def monte_carlo_simulation(S0, mu, sigma, days, simulations):
     
     return prices
 
-def plot_simulation(prices):
+def plot_simulation(prices, ticker):
     plt.figure(figsize=(10, 5))
     avg_prices = np.mean(prices, axis=1)  # Calculate average across all simulations
-    plt.plot(avg_prices, color='blue', linewidth=2, label='Average Price')
-    plt.xlabel("Days")
+    days = np.arange(len(avg_prices))  # Create an array for the days
+    plt.plot(days, avg_prices, color='blue', linewidth=2, label='Average Price')
+    plt.xlabel("Days (Future Trading Days)")
     plt.ylabel("Stock Price")
-    plt.title("Monte Carlo Stock Price Simulation - Average Path")
+    plt.title(f"Monte Carlo Stock Price Simulation - {ticker} (Average Path)")
     plt.legend()
     plt.show()
 
@@ -45,7 +46,7 @@ def main():
     simulations = 100  # Number of simulations
     
     prices = monte_carlo_simulation(S0, mu, sigma, days, simulations)
-    plot_simulation(prices)
+    plot_simulation(prices, ticker)
     
     # Save to CSV
     df = pd.DataFrame(prices)
