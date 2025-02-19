@@ -50,9 +50,10 @@ def get_stock_data(ticker):
     
     # Ensure past_actual_prices has exactly 252 days
     past_actual_prices = stock_data[-504:-252]
-    if len(past_actual_prices) != 252:
+    if len(past_actual_prices) > 252:
         past_actual_prices = past_actual_prices[-252:]  # Trim excess
-
+    elif len(past_actual_prices) < 252:
+        past_actual_prices = np.pad(past_actual_prices, (252 - len(past_actual_prices), 0), mode='edge')  # Pad if missing days
     return stock_data[-1], mu, sigma, stock_data[-252:], past_actual_prices
 
 def main():
