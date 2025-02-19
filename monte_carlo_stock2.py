@@ -17,12 +17,15 @@ def monte_carlo_simulation(S0, mu, sigma, days, simulations):
 def plot_simulation(prices, ticker, actual_prices):
     plt.figure(figsize=(10, 5))
     avg_prices = np.mean(prices, axis=1)  # Calculate average across all simulations
-    days = np.arange(len(avg_prices))  # Create an array for the days
     
-    plt.plot(days, avg_prices, color='blue', linewidth=2, label='Simulated Average Price')
-    plt.plot(range(len(actual_prices)), actual_prices, color='red', linestyle='dashed', linewidth=2, label='Actual Price')
+    days_past = np.arange(-len(actual_prices), 0)  # Days for actual past data
+    days_future = np.arange(0, len(avg_prices))  # Days for simulated future data
     
-    plt.xlabel("Days (Future Trading Days)")
+    plt.plot(days_past, actual_prices, color='red', linestyle='dashed', linewidth=2, label='Actual Price')
+    plt.plot(days_future, avg_prices, color='blue', linewidth=2, label='Simulated Average Price')
+    
+    plt.axvline(0, color='black', linestyle='dotted', label='Today')  # Mark separation between past and future
+    plt.xlabel("Days (Past to Future Trading Days)")
     plt.ylabel("Stock Price")
     plt.title(f"Monte Carlo Stock Price Simulation vs Actual - {ticker}")
     plt.legend()
@@ -35,11 +38,11 @@ def get_stock_data(ticker):
     # Debugging: Print columns to ensure "Close" exists
     print("Available Columns in Downloaded Data:", hist.columns)
     
-    stock_data = hist['Close']  # Use 'Close' instead of 'Adj Close'
-    log_returns = np.log(stock_data / stock_data.shift(1))
+    stock_data = hist['Close'].values  # Use 'Close' instead of 'Adj Close'
+    log_returns = np.log(stock_data[1:] / stock_data[:-1])
     mu = log_returns.mean()
     sigma = log_returns.std()
-    return stock_data.iloc[-1], mu, sigma, stock_data.values  # Also return actual historical prices
+    return stock_data[-1], mu, sigma, stock_data  # Also return actual historical prices
 
 def main():
     # Fetch real stock data
