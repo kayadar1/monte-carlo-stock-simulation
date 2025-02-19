@@ -53,6 +53,7 @@ def get_stock_data(ticker):
     
     # Ensure past_actual_prices has exactly 252 days
     past_actual_prices = stock_data[-504:-252]
+    past_actual_prices[-1] = stock_data[-252]
     if len(past_actual_prices) > 252:
         past_actual_prices = past_actual_prices[-252:]  # Trim excess
     elif len(past_actual_prices) < 252:
