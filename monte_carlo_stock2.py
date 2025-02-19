@@ -47,21 +47,27 @@ def get_stock_data(ticker):
     return stock_data[-1], mu, sigma, stock_data[-252:]  # Ensure last 252 trading days
 
 def main():
-    ticker = "AAPL"  # Example: Apple stock
-    S0, mu, sigma, actual_prices = get_stock_data(ticker)
+    tickers = ["AAPL", "MSFT", "GOOGL"]  # List of stocks to simulate
     days = 252  # 1 trading year
     simulations = 100  # Number of simulations
     
-    future_simulation = monte_carlo_simulation(S0, mu, sigma, days, simulations)
+    for ticker in tickers:
+        print(f"Running Monte Carlo Simulation for {ticker}...")
+        S0, mu, sigma, actual_prices = get_stock_data(ticker)
+        future_simulation = monte_carlo_simulation(S0, mu, sigma, days, simulations)
+        
+        # Save each stock’s data separately
+        df = pd.DataFrame(future_simulation)
+        df.to_csv(f"monte_carlo_simulation_{ticker}.csv", index=False)
+        
+        # Plot each stock’s simulation
+        plot_simulation(future_simulation, ticker, actual_prices)
     
-    plot_simulation(future_simulation, ticker, actual_prices)
-    
-    df = pd.DataFrame(future_simulation)
-    df.to_csv("monte_carlo_simulation.csv", index=False)
-    print(f"Simulation data for {ticker} saved to monte_carlo_simulation.csv")
+    print("Simulations completed for all stocks!")
 
 if __name__ == "__main__":
     main()
+
 
 
 
