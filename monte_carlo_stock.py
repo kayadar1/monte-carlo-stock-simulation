@@ -5,7 +5,22 @@ import yfinance as yf
 
 def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1000, time_horizon=252):
     # Fetch historical data
-    stock_data = yf.download(stock_ticker, start=start_date, end=end_date)['Adj Close']
+    stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
+
+# Check if data is retrieved
+if stock_data.empty:
+    raise ValueError("Yahoo Finance did not return any data. Check ticker symbol or date range.")
+
+# Use the correct column
+if 'Adj Close' in stock_data.columns:
+    stock_data = stock_data['Adj Close']
+elif 'Close' in stock_data.columns:
+    stock_data = stock_data['Close']
+else:
+    raise ValueError("No valid price data found in Yahoo Finance response")
+
+print(stock_data.head())  # Debugging: See fetched data
+
     
     # Calculate daily returns
     log_returns = np.log(stock_data / stock_data.shift(1)).dropna()
