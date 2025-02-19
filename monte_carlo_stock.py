@@ -7,21 +7,28 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     # Fetch historical data
     stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
 
-    # Debugging: Print the first few rows and available columns
-    print("\nRetrieved Data (First 5 rows):\n", stock_data.head())
-    print("\nAvailable Columns:\n", stock_data.columns)
+    # Debugging: Print what data was retrieved
+    print("\n🔹 Retrieved Data (First 5 rows):\n", stock_data.head())
+    print("\n🔹 Available Columns:\n", stock_data.columns)
 
-    # Ensure valid columns exist
-    if 'Adj Close' in stock_data.columns:
-        stock_data = stock_data['Adj Close']
-    elif 'Close' in stock_data.columns:  # Some stocks may only have 'Close'
-        stock_data = stock_data['Close']
-    else:
-        raise ValueError(f"No valid price data found for {stock_ticker}. Check available columns: {stock_data.columns}")
+    # Ensure valid columns exist dynamically
+    price_column = None
+    for col in stock_data.columns:
+        if "Adj Close" in col:
+            price_column = col
+            break
+        elif "Close" in col:
+            price_column = col  # Use 'Close' if 'Adj Close' is missing
+
+    if price_column is None:
+        raise ValueError(f"⚠️ No valid price data found for {stock_ticker}. Available columns: {stock_data.columns}")
+
+    print(f"\n✅ Using column: {price_column}\n")
+    stock_data = stock_data[price_column]
 
     # Check if data is empty
     if stock_data.empty:
-        raise ValueError(f"No data found for {stock_ticker} in the given date range {start_date} to {end_date}.")
+        raise ValueError(f"⚠️ No data found for {stock_ticker} in the given date range {start_date} to {end_date}.")
 
     # Calculate daily returns
     log_returns = np.log(stock_data / stock_data.shift(1)).dropna()
@@ -50,3 +57,4 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
 
 # Example Usage
 monte_carlo_simulation('AAPL', '2023-01-01', '2024-01-01')
+
