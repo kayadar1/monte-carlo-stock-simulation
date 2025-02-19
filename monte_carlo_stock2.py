@@ -25,7 +25,9 @@ def plot_simulation(prices, ticker, past_actual_prices, past_simulation):
     past_actual_prices = past_actual_prices[-252:]
     
     # Ensure continuity: set the last past simulated value to match today's price
-    avg_past_simulation[-1] = past_actual_prices[-1]
+    # Adjust past simulation to smoothly connect to today's actual price
+    scaling_factor = past_actual_prices[-1] / avg_past_simulation[-1]
+    avg_past_simulation *= scaling_factor  # Scale past simulation to match the actual last price
     
     # Days arrays
     days_past = np.arange(-252, 0)  # Last year's actual trading days
