@@ -14,14 +14,17 @@ def monte_carlo_simulation(S0, mu, sigma, days, simulations):
     
     return prices
 
-def plot_simulation(prices, ticker):
+def plot_simulation(prices, ticker, actual_prices):
     plt.figure(figsize=(10, 5))
     avg_prices = np.mean(prices, axis=1)  # Calculate average across all simulations
     days = np.arange(len(avg_prices))  # Create an array for the days
-    plt.plot(days, avg_prices, color='blue', linewidth=2, label='Average Price')
+    
+    plt.plot(days, avg_prices, color='blue', linewidth=2, label='Simulated Average Price')
+    plt.plot(range(len(actual_prices)), actual_prices, color='red', linestyle='dashed', linewidth=2, label='Actual Price')
+    
     plt.xlabel("Days (Future Trading Days)")
     plt.ylabel("Stock Price")
-    plt.title(f"Monte Carlo Stock Price Simulation - {ticker} (Average Path)")
+    plt.title(f"Monte Carlo Stock Price Simulation vs Actual - {ticker}")
     plt.legend()
     plt.show()
 
@@ -36,17 +39,17 @@ def get_stock_data(ticker):
     log_returns = np.log(stock_data / stock_data.shift(1))
     mu = log_returns.mean()
     sigma = log_returns.std()
-    return stock_data.iloc[-1], mu, sigma
+    return stock_data.iloc[-1], mu, sigma, stock_data.values  # Also return actual historical prices
 
 def main():
     # Fetch real stock data
     ticker = "AAPL"  # Example: Apple stock
-    S0, mu, sigma = get_stock_data(ticker)
+    S0, mu, sigma, actual_prices = get_stock_data(ticker)
     days = 252  # 1 trading year
     simulations = 100  # Number of simulations
     
     prices = monte_carlo_simulation(S0, mu, sigma, days, simulations)
-    plot_simulation(prices, ticker)
+    plot_simulation(prices, ticker, actual_prices)
     
     # Save to CSV
     df = pd.DataFrame(prices)
