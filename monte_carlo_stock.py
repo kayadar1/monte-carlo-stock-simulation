@@ -8,13 +8,13 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
 
     # Debugging: Print the first few rows and available columns
-    print("Retrieved Data:\n", stock_data.head())
-    print("Available columns:", stock_data.columns)
+    print("\nRetrieved Data (First 5 rows):\n", stock_data.head())
+    print("\nAvailable Columns:\n", stock_data.columns)
 
     # Ensure valid columns exist
     if 'Adj Close' in stock_data.columns:
         stock_data = stock_data['Adj Close']
-    elif 'Close' in stock_data.columns:  # Use 'Close' if 'Adj Close' is unavailable
+    elif 'Close' in stock_data.columns:  # Some stocks may only have 'Close'
         stock_data = stock_data['Close']
     else:
         raise ValueError(f"No valid price data found for {stock_ticker}. Check available columns: {stock_data.columns}")
@@ -49,5 +49,4 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     plt.show()
 
 # Example Usage
-monte_carlo_simulation('GOOG', '2023-01-01', '2024-01-01')
-
+monte_carlo_simulation('AAPL', '2023-01-01', '2024-01-01')
