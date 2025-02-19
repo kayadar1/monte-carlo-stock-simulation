@@ -14,24 +14,22 @@ def monte_carlo_simulation(S0, mu, sigma, days, simulations):
     
     return prices
 
-def plot_simulation(prices, ticker, actual_prices, past_simulation, past_actual_prices):
+def plot_simulation(prices, ticker, actual_prices, past_simulation):
     plt.figure(figsize=(10, 5))
-    avg_prices = np.mean(prices, axis=1)  # Calculate average across all simulations
+    avg_prices = np.mean(prices, axis=1)  # Average of future simulations
     avg_past_simulation = np.mean(past_simulation, axis=1)  # Average of past simulation
     
     days_past = np.arange(-len(actual_prices), 0)  # Days for actual past data
     days_future = np.arange(0, len(avg_prices))  # Days for simulated future data
+    days_simulation = np.concatenate([days_past, days_future])  # Full timeline
     
-    # Adjust past_actual_prices length to match 252 days
-    past_actual_prices = past_actual_prices[-252:]
-    days_past_simulation = np.arange(-len(past_actual_prices), 0)
+    combined_simulation = np.concatenate([avg_past_simulation, avg_prices])  # Full simulated data
+    combined_actual = actual_prices  # Only past actual prices
     
-    plt.plot(days_past, actual_prices, color='red', linestyle='dashed', linewidth=2, label='Actual Price (Past)')
-    plt.plot(days_future, avg_prices, color='blue', linewidth=2, label='Simulated Average Price (Future)')
-    plt.plot(days_past_simulation, avg_past_simulation, color='green', linestyle='dashed', linewidth=2, label='Simulated Projection (Last Year)')
-    plt.plot(days_past_simulation, past_actual_prices, color='purple', linestyle='dotted', linewidth=2, label='Actual Price (Last Year)')
+    plt.plot(days_simulation, combined_simulation, color='blue', linewidth=2, label='Simulated Price')
+    plt.plot(days_past, combined_actual, color='red', linestyle='solid', linewidth=2, label='Actual Price')
     
-    plt.axvline(0, color='black', linestyle='dotted', label='Today')  # Mark separation between past and future
+    plt.axvline(0, color='black', linestyle='dashed', label='Today')  # Mark separation between past and future
     plt.xlabel("Days (Past to Future Trading Days)")
     plt.ylabel("Stock Price")
     plt.title(f"Monte Carlo Stock Price Simulation vs Actual - {ticker}")
@@ -42,7 +40,6 @@ def get_stock_data(ticker):
     stock = yf.Ticker(ticker)
     hist = stock.history(period="2y")  # Fetch last 2 years to compare past projections
     
-    # Debugging: Print columns to ensure "Close" exists
     print("Available Columns in Downloaded Data:", hist.columns)
     
     stock_data = hist['Close'].values
@@ -53,24 +50,23 @@ def get_stock_data(ticker):
     return stock_data[-1], mu, sigma, stock_data[-252:], stock_data[-504:-252]  # Return current data and past year prices
 
 def main():
-    # Fetch real stock data
     ticker = "AAPL"  # Example: Apple stock
     S0, mu, sigma, actual_prices, past_actual_prices = get_stock_data(ticker)
     days = 252  # 1 trading year
     simulations = 100  # Number of simulations
     
-    prices = monte_carlo_simulation(S0, mu, sigma, days, simulations)
     past_simulation = monte_carlo_simulation(past_actual_prices[0], mu, sigma, days, simulations)  # Generate past projection
+    future_simulation = monte_carlo_simulation(S0, mu, sigma, days, simulations)
     
-    plot_simulation(prices, ticker, actual_prices, past_simulation, past_actual_prices)
+    plot_simulation(future_simulation, ticker, past_actual_prices, past_simulation)
     
-    # Save to CSV
-    df = pd.DataFrame(prices)
+    df = pd.DataFrame(future_simulation)
     df.to_csv("monte_carlo_simulation.csv", index=False)
     print(f"Simulation data for {ticker} saved to monte_carlo_simulation.csv")
 
 if __name__ == "__main__":
     main()
+
 
 
 
