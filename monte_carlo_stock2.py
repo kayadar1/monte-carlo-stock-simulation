@@ -22,11 +22,12 @@ def plot_simulation(prices, ticker, actual_prices, past_simulation, past_actual_
     days_past = np.arange(-len(actual_prices), 0)  # Days for actual past data
     days_future = np.arange(0, len(avg_prices))  # Days for simulated future data
     
+    # Adjust past_actual_prices length to match 252 days
+    past_actual_prices = past_actual_prices[-252:]
+    days_past_simulation = np.arange(-len(past_actual_prices), 0)
+    
     plt.plot(days_past, actual_prices, color='red', linestyle='dashed', linewidth=2, label='Actual Price (Past)')
     plt.plot(days_future, avg_prices, color='blue', linewidth=2, label='Simulated Average Price (Future)')
-    
-    # Past Projection
-    days_past_simulation = np.arange(-len(past_actual_prices), -len(past_actual_prices) + len(avg_past_simulation))
     plt.plot(days_past_simulation, avg_past_simulation, color='green', linestyle='dashed', linewidth=2, label='Simulated Projection (Last Year)')
     plt.plot(days_past_simulation, past_actual_prices, color='purple', linestyle='dotted', linewidth=2, label='Actual Price (Last Year)')
     
