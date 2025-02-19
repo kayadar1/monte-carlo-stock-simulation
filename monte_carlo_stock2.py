@@ -47,7 +47,11 @@ def get_stock_data(ticker):
     mu = log_returns.mean()
     sigma = log_returns.std()
     
-    return stock_data[-1], mu, sigma, stock_data[-252:], stock_data[-504:-252]  # Return current data and past year prices
+    past_actual_prices = stock_data[-504:-252]  # Last year's actual prices
+if len(past_actual_prices) != 252:  # Ensure it has 252 days
+    past_actual_prices = past_actual_prices[-252:]  # Trim excess or pad if needed
+
+return stock_data[-1], mu, sigma, stock_data[-252:], past_actual_prices
 
 def main():
     ticker = "AAPL"  # Example: Apple stock
