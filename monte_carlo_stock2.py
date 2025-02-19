@@ -16,10 +16,12 @@ def monte_carlo_simulation(S0, mu, sigma, days, simulations):
 
 def plot_simulation(prices):
     plt.figure(figsize=(10, 5))
-    plt.plot(prices, alpha=0.5)
+    avg_prices = np.mean(prices, axis=1)  # Calculate average across all simulations
+    plt.plot(avg_prices, color='blue', linewidth=2, label='Average Price')
     plt.xlabel("Days")
     plt.ylabel("Stock Price")
-    plt.title("Monte Carlo Stock Price Simulation")
+    plt.title("Monte Carlo Stock Price Simulation - Average Path")
+    plt.legend()
     plt.show()
 
 def get_stock_data(ticker):
@@ -52,5 +54,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
