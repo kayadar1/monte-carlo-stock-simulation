@@ -8,29 +8,24 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
 
     # 🔹 Step 1: Print full stock data to inspect its format
-    print("\n🔹 Full Data Retrieved from Yahoo Finance:\n", stock_data)
+    print("\n🔹 FULL DATASET RETRIEVED FROM YAHOO FINANCE:\n", stock_data)
     
-    # 🔹 Step 2: Print available columns to see what's returned
-    print("\n🔹 Available Columns:\n", stock_data.columns.tolist())
+    # 🔹 Step 2: Print available columns to see what we have
+    print("\n🔹 AVAILABLE COLUMNS FROM YAHOO FINANCE:\n", stock_data.columns.tolist())
 
-    # 🔹 Step 3: Dynamically find a valid price column
-    price_column = None
-    for col in stock_data.columns:
-        if "Adj Close" in col:
-            price_column = col
-            break
-        elif "Close" in col:
-            price_column = col  # Use 'Close' if 'Adj Close' is missing
-
-    if price_column is None:
+    # 🔹 Step 3: Check if 'Adj Close' exists; otherwise, use 'Close'
+    if "Adj Close" in stock_data.columns:
+        stock_data = stock_data["Adj Close"]
+        print("\n✅ Using 'Adj Close' column\n")
+    elif "Close" in stock_data.columns:
+        stock_data = stock_data["Close"]
+        print("\n⚠️ 'Adj Close' not found, using 'Close' instead\n")
+    else:
         raise ValueError(f"⚠️ No valid price data found for {stock_ticker}. Available columns: {stock_data.columns.tolist()}")
-
-    print(f"\n✅ Using column: {price_column}\n")
-    stock_data = stock_data[price_column]
 
     # 🔹 Step 4: Check if data is empty
     if stock_data.empty:
-        raise ValueError(f"⚠️ No data found for {stock_ticker} in the given date range {start_date} to {end_date}.")
+        raise ValueError(f"⚠️ No stock data found for {stock_ticker} in the date range {start_date} to {end_date}. Try changing the date range or ticker.")
 
     # Calculate daily returns
     log_returns = np.log(stock_data / stock_data.shift(1)).dropna()
