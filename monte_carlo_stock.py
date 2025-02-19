@@ -25,10 +25,15 @@ def plot_simulation(prices):
 def get_stock_data(ticker):
     stock = yf.Ticker(ticker)
     hist = stock.history(period="1y")
-    log_returns = np.log(hist["Close"] / hist["Close"].shift(1))
+    
+    # Debugging: Print columns to ensure "Close" exists
+    print("Available Columns in Downloaded Data:", hist.columns)
+    
+    stock_data = hist['Close']  # Use 'Close' instead of 'Adj Close'
+    log_returns = np.log(stock_data / stock_data.shift(1))
     mu = log_returns.mean()
     sigma = log_returns.std()
-    return hist["Close"].iloc[-1], mu, sigma
+    return stock_data.iloc[-1], mu, sigma
 
 def main():
     # Fetch real stock data
@@ -47,4 +52,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
