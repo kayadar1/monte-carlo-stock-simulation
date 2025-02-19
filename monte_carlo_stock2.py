@@ -24,6 +24,9 @@ def plot_simulation(prices, ticker, past_actual_prices, past_simulation):
     avg_past_simulation = avg_past_simulation[-252:]
     past_actual_prices = past_actual_prices[-252:]
     
+    # Ensure continuity: set the last past simulated value to match today's price
+    avg_past_simulation[-1] = past_actual_prices[-1]
+    
     # Days arrays
     days_past = np.arange(-252, 0)  # Last year's actual trading days
     days_future = np.arange(0, 252)  # Next year's predicted trading days
@@ -78,6 +81,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
