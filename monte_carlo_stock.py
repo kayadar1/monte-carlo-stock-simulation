@@ -58,3 +58,4 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
 # Example Usage
 monte_carlo_simulation('AAPL', '2023-01-01', '2024-01-01')
 
+
