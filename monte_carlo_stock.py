@@ -7,29 +7,29 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     # Fetch historical data
     stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
 
-# Check if data is retrieved
-if stock_data.empty:
-    raise ValueError("Yahoo Finance did not return any data. Check ticker symbol or date range.")
+    # Print the first few rows to debug
+    print(stock_data.head())  
 
-# Use the correct column
-if 'Adj Close' in stock_data.columns:
-    stock_data = stock_data['Adj Close']
-elif 'Close' in stock_data.columns:
-    stock_data = stock_data['Close']
-else:
-    raise ValueError("No valid price data found in Yahoo Finance response")
+    # Check for valid price data columns
+    if 'Adj Close' in stock_data.columns:
+        stock_data = stock_data['Adj Close']
+    elif 'Close' in stock_data.columns:  # Some stocks only have 'Close'
+        stock_data = stock_data['Close']
+    else:
+        raise ValueError("No valid price data found. Check stock ticker or date range.")
 
-print(stock_data.head())  # Debugging: See fetched data
+    # Handle empty data
+    if stock_data.empty:
+        raise ValueError("No data was returned from Yahoo Finance. Verify ticker and date range.")
 
-    
     # Calculate daily returns
     log_returns = np.log(stock_data / stock_data.shift(1)).dropna()
     mu = log_returns.mean()  # Average return
     sigma = log_returns.std()  # Volatility
-    
+
     # Get last stock price
     last_price = stock_data[-1]
-    
+
     # Monte Carlo simulation
     simulations = np.zeros((time_horizon, num_simulations))
     for i in range(num_simulations):
@@ -38,7 +38,7 @@ print(stock_data.head())  # Debugging: See fetched data
             next_price = price_series[-1] * np.exp(np.random.normal(mu, sigma))
             price_series.append(next_price)
         simulations[:, i] = price_series
-    
+
     # Plot results
     plt.figure(figsize=(10, 5))
     plt.plot(simulations, alpha=0.2, color='blue')
@@ -49,3 +49,4 @@ print(stock_data.head())  # Debugging: See fetched data
 
 # Example Usage
 monte_carlo_simulation('AAPL', '2023-01-01', '2024-01-01')
+
