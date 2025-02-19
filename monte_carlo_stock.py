@@ -7,20 +7,20 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     # Fetch historical data
     stock_data = yf.download(stock_ticker, start=start_date, end=end_date)
 
-    # Print the first few rows to debug
-    print(stock_data.head())  
+    # Print the first few rows to check column names
+    print("Retrieved Data:\n", stock_data.head())
 
-    # Check for valid price data columns
+    # Ensure valid columns exist
     if 'Adj Close' in stock_data.columns:
         stock_data = stock_data['Adj Close']
-    elif 'Close' in stock_data.columns:  # Some stocks only have 'Close'
+    elif 'Close' in stock_data.columns:
         stock_data = stock_data['Close']
     else:
-        raise ValueError("No valid price data found. Check stock ticker or date range.")
+        raise ValueError(f"No valid price data found for {stock_ticker}. Available columns: {stock_data.columns}")
 
-    # Handle empty data
+    # Check if data is empty
     if stock_data.empty:
-        raise ValueError("No data was returned from Yahoo Finance. Verify ticker and date range.")
+        raise ValueError(f"No data found for {stock_ticker} in the given date range {start_date} to {end_date}.")
 
     # Calculate daily returns
     log_returns = np.log(stock_data / stock_data.shift(1)).dropna()
@@ -28,7 +28,7 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
     sigma = log_returns.std()  # Volatility
 
     # Get last stock price
-    last_price = stock_data[-1]
+    last_price = stock_data.iloc[-1]
 
     # Monte Carlo simulation
     simulations = np.zeros((time_horizon, num_simulations))
@@ -49,4 +49,3 @@ def monte_carlo_simulation(stock_ticker, start_date, end_date, num_simulations=1
 
 # Example Usage
 monte_carlo_simulation('AAPL', '2023-01-01', '2024-01-01')
-
